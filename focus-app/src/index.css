@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  /* Color: card-catalog reading room */
+  --color-paper: #EBE7DC;
+  --color-paper-dim: #E1DCCE;
+  --color-card: #F7F4EC;
+  --color-ink: #23271F;
+  --color-ink-soft: #565A4E;
+  --color-line: #C9C2AE;
+  --color-line-soft: #DAD5C4;
+  --color-moss: #47593F;
+  --color-moss-light: #7C8F6E;
+  --color-rust: #93502F;
+  --color-rust-soft: #C9926B;
+
+  --font-display: "Fraunces", "Iowan Old Style", serif;
+  --font-body: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* subtle paper grain so the flat color doesn't feel like a template */
+.paper-grain {
+  background-image: radial-gradient(circle at 1px 1px, rgba(35,39,31,0.05) 1px, transparent 0);
+  background-size: 3px 3px;
+}
+
+.card-index {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-line);
+  position: relative;
+}
+
+.card-index::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: -1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+}
+
+.card-index::after {
+  content: "";
+  position: absolute;
+  bottom: 14px;
+  left: -1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+}
+
+::selection {
+  background: var(--color-moss-light);
+  color: var(--color-card);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-moss);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
