@@ -1,7 +1,16 @@
 import { useState } from 'react'
-import { Plus, LibraryBig } from 'lucide-react'
+import { Plus, LibraryBig, Clock } from 'lucide-react'
 
-export default function Sidebar({ shelves, activeShelfId, itemCounts, onSelect, onCreateShelf, isOpen }) {
+export default function Sidebar({
+  shelves,
+  activeShelfId,
+  itemCounts,
+  onSelect,
+  onCreateShelf,
+  isOpen,
+  showTimeTable,
+  onToggleTimeTable,
+}) {
   const [creating, setCreating] = useState(false)
   const [name, setName] = useState('')
 
@@ -22,6 +31,16 @@ export default function Sidebar({ shelves, activeShelfId, itemCounts, onSelect, 
         <span className="font-display text-lg tracking-tight">Focus</span>
       </div>
 
+      <button
+        onClick={onToggleTimeTable}
+        className={`text-left px-2.5 py-1.5 mb-6 text-sm flex items-center gap-2 ${
+          showTimeTable ? 'bg-moss text-card' : 'text-ink hover:bg-line-soft'
+        }`}
+      >
+        <Clock size={15} strokeWidth={1.75} />
+        <span>Time Table</span>
+      </button>
+
       <div className="flex items-center justify-between mb-3">
         <span className="font-mono text-[10px] uppercase tracking-widest text-ink-soft">Shelves</span>
         <button
@@ -37,7 +56,7 @@ export default function Sidebar({ shelves, activeShelfId, itemCounts, onSelect, 
         <button
           onClick={() => onSelect(null)}
           className={`text-left px-2.5 py-1.5 text-sm flex items-center justify-between group ${
-            activeShelfId === null ? 'bg-moss text-card' : 'text-ink hover:bg-line-soft'
+            activeShelfId === null && !showTimeTable ? 'bg-moss text-card' : 'text-ink hover:bg-line-soft'
           }`}
         >
           <span>All items</span>
@@ -47,11 +66,15 @@ export default function Sidebar({ shelves, activeShelfId, itemCounts, onSelect, 
             key={shelf.id}
             onClick={() => onSelect(shelf.id)}
             className={`text-left px-2.5 py-1.5 text-sm flex items-center justify-between ${
-              activeShelfId === shelf.id ? 'bg-moss text-card' : 'text-ink hover:bg-line-soft'
+              activeShelfId === shelf.id && !showTimeTable ? 'bg-moss text-card' : 'text-ink hover:bg-line-soft'
             }`}
           >
             <span className="truncate">{shelf.name}</span>
-            <span className={`font-mono text-[10px] ${activeShelfId === shelf.id ? 'text-card/70' : 'text-ink-soft/70'}`}>
+            <span
+              className={`font-mono text-[10px] ${
+                activeShelfId === shelf.id && !showTimeTable ? 'text-card/70' : 'text-ink-soft/70'
+              }`}
+            >
               {itemCounts[shelf.id] || 0}
             </span>
           </button>
