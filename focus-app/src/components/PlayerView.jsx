@@ -1,6 +1,5 @@
 import { ArrowLeft, ExternalLink, ShieldAlert } from 'lucide-react'
 import YouTubePlayer from './YouTubePlayer'
-
 export default function PlayerView({ item, onBack }) {
   if (!item) return null
 

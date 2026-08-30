@@ -9,6 +9,7 @@ import ItemCard from './components/ItemCard'
 import EmptyState from './components/EmptyState'
 import AddItemModal from './components/AddItemModal'
 import PlayerView from './components/PlayerView'
+import TimeTable from './components/Timetable'
 
 export default function App() {
   const [activeShelfId, setActiveShelfId] = useState(null) // null = all items
@@ -16,6 +17,7 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false)
   const [openItem, setOpenItem] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [showTimeTable, setShowTimeTable] = useState(false)
 
   const shelves = useLiveQuery(() => db.shelves.orderBy('sortIndex').toArray(), [], [])
   const allItems = useLiveQuery(() => db.items.orderBy('addedAt').reverse().toArray(), [], [])
@@ -69,9 +71,26 @@ export default function App() {
     setActiveShelfId(id)
   }
 
+  async function handleDeleteShelf(shelf) {
+    const fallbackId = await ensureDefaultShelf()
+    if (fallbackId !== shelf.id) {
+      const itemsInShelf = (allItems || []).filter((i) => i.shelfId === shelf.id)
+      await Promise.all(itemsInShelf.map((i) => db.items.update(i.id, { shelfId: fallbackId })))
+    }
+    await db.shelves.delete(shelf.id)
+    if (activeShelfId === shelf.id) {
+      setActiveShelfId(null)
+    }
+  }
+
   const activeShelfName = activeShelfId
     ? shelves?.find((s) => s.id === activeShelfId)?.name
     : 'All items'
+
+  function handleToggleTimeTable() {
+    setShowTimeTable((v) => !v)
+    setSidebarOpen(false)
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -81,10 +100,15 @@ export default function App() {
         itemCounts={itemCounts}
         onSelect={(id) => {
           setActiveShelfId(id)
+          setShowTimeTable(false)
           setSidebarOpen(false)
         }}
         onCreateShelf={handleCreateShelf}
+        onDeleteShelf={handleDeleteShelf}
         isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        showTimeTable={showTimeTable}
+        onToggleTimeTable={handleToggleTimeTable}
       />
 
       <main className="flex-1 min-w-0">
@@ -97,28 +121,34 @@ export default function App() {
             >
               <Menu size={19} />
             </button>
-            <h1 className="font-display text-lg md:text-xl text-ink truncate">{activeShelfName}</h1>
+            <h1 className="font-display text-lg md:text-xl text-ink truncate">
+              {showTimeTable ? 'Time Table' : activeShelfName}
+            </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <SearchBar value={query} onChange={setQuery} />
-            <button
-              onClick={() => setModalOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 bg-moss text-card text-sm px-3.5 py-2 hover:bg-ink transition-colors shrink-0"
-            >
-              <Plus size={15} /> Add
-            </button>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="sm:hidden bg-moss text-card p-2"
-              aria-label="Add item"
-            >
-              <Plus size={17} />
-            </button>
-          </div>
+          {!showTimeTable && (
+            <div className="flex items-center gap-3">
+              <SearchBar value={query} onChange={setQuery} />
+              <button
+                onClick={() => setModalOpen(true)}
+                className="hidden sm:flex items-center gap-1.5 bg-moss text-card text-sm px-3.5 py-2 hover:bg-ink transition-colors shrink-0"
+              >
+                <Plus size={15} /> Add
+              </button>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="sm:hidden bg-moss text-card p-2"
+                aria-label="Add item"
+              >
+                <Plus size={17} />
+              </button>
+            </div>
+          )}
         </header>
 
         <div className="paper-grain px-5 md:px-8 py-6">
-          {visibleItems.length === 0 ? (
+          {showTimeTable ? (
+            <TimeTable />
+          ) : visibleItems.length === 0 ? (
             <EmptyState onAdd={() => setModalOpen(true)} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
