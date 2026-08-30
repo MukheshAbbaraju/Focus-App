@@ -71,6 +71,18 @@ export default function App() {
     setActiveShelfId(id)
   }
 
+  async function handleDeleteShelf(shelf) {
+    const fallbackId = await ensureDefaultShelf()
+    if (fallbackId !== shelf.id) {
+      const itemsInShelf = (allItems || []).filter((i) => i.shelfId === shelf.id)
+      await Promise.all(itemsInShelf.map((i) => db.items.update(i.id, { shelfId: fallbackId })))
+    }
+    await db.shelves.delete(shelf.id)
+    if (activeShelfId === shelf.id) {
+      setActiveShelfId(null)
+    }
+  }
+
   const activeShelfName = activeShelfId
     ? shelves?.find((s) => s.id === activeShelfId)?.name
     : 'All items'
@@ -92,7 +104,9 @@ export default function App() {
           setSidebarOpen(false)
         }}
         onCreateShelf={handleCreateShelf}
+        onDeleteShelf={handleDeleteShelf}
         isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         showTimeTable={showTimeTable}
         onToggleTimeTable={handleToggleTimeTable}
       />
