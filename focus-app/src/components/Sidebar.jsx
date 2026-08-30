@@ -43,7 +43,7 @@ export default function Sidebar({
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-72 flex-col border-r border-line bg-paper-dim/95 px-5 py-6 flex transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:static md:translate-x-0 md:transition-none md:w-60 md:shrink-0 md:h-screen md:sticky md:top-0 md:bg-paper-dim/60`}
+        } md:z-auto md:inset-auto md:translate-x-0 md:transition-none md:w-60 md:shrink-0 md:h-screen md:sticky md:top-0 md:bg-paper-dim/60`}
       >
         <div className="flex items-center gap-2 mb-8">
           <LibraryBig size={19} className="text-moss" strokeWidth={1.5} />
